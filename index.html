@@ -5,184 +5,851 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Savoldi Freiland Shop</title>
 
-<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
 <script src="https://unpkg.com/feather-icons"></script>
 
 <style>
-  .btn-green {
-    background:#008231;
-    color:white;
-    transition:background 0.2s;
-  }
-  .btn-green:hover { background:#00691a; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  .btn-green:focus-visible {
-    outline:none;
-    box-shadow:0 0 0 2px rgba(0,130,49,.35);
+  :root {
+    --green:       #1d6b3a;
+    --green-dark:  #145229;
+    --green-light: #e8f3ec;
+    --cream:       #faf7f2;
+    --sand:        #f0e9db;
+    --brown:       #7a5c3a;
+    --text:        #1c1a17;
+    --muted:       #6b6255;
+    --white:       #ffffff;
+    --badge-red:   #c0392b;
+    --radius:      1rem;
+    --shadow:      0 4px 24px rgba(0,0,0,.08);
+    --shadow-lg:   0 12px 48px rgba(0,0,0,.13);
   }
 
-  .btn-cart:focus-visible {
-    box-shadow:none;
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
 
-  .product-img {
-    height:160px;
-    width:100%;
-    object-fit:cover;
-    border-radius:0.75rem;
+  /* ── SCROLLBAR ─────────────────────────── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--sand); }
+  ::-webkit-scrollbar-thumb { background: var(--green); border-radius: 3px; }
+
+  /* ── HEADER ────────────────────────────── */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(250,247,242,.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0,0,0,.07);
+    padding: .9rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
   }
 
   .logo-img {
-    height:65px;
-    width:auto;
-    object-fit:contain;
+    height: 56px;
+    width: auto;
+    object-fit: contain;
+    cursor: pointer;
+    transition: opacity .2s;
+  }
+  .logo-img:hover { opacity: .8; }
+
+  nav { display: flex; gap: .5rem; align-items: center; }
+
+  .nav-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: .875rem;
+    font-weight: 500;
+    letter-spacing: .01em;
+    color: var(--muted);
+    background: transparent;
+    border: none;
+    padding: .45rem .9rem;
+    border-radius: 2rem;
+    cursor: pointer;
+    transition: color .2s, background .2s;
+  }
+  .nav-btn:hover { color: var(--green); background: var(--green-light); }
+  .nav-btn.active { color: var(--white); background: var(--green); }
+
+  .cart-btn {
+    position: relative;
+    font-size: 1.1rem;
+    background: var(--green);
+    border: none;
+    color: var(--white);
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .2s, transform .15s;
+    box-shadow: 0 2px 8px rgba(29,107,58,.3);
+  }
+  .cart-btn:hover { background: var(--green-dark); transform: scale(1.05); }
+
+  #cart-count {
+    position: absolute;
+    top: -4px; right: -4px;
+    background: var(--badge-red);
+    color: #fff;
+    font-size: .65rem;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    padding: 0 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
+  /* ── CART DRAWER ───────────────────────── */
+  #cart-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    z-index: 40;
+    backdrop-filter: blur(2px);
+  }
+  #cart-overlay.show { display: block; animation: fadeIn .25s ease; }
+
+  @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
+
+  #cart {
+    position: fixed;
+    right: 0; top: 0;
+    width: min(380px, 92vw);
+    height: 100%;
+    background: var(--white);
+    z-index: 50;
+    transform: translateX(100%);
+    transition: transform .35s cubic-bezier(.4,0,.2,1);
+    display: flex;
+    flex-direction: column;
+    box-shadow: -8px 0 40px rgba(0,0,0,.15);
+  }
+  #cart.open { transform: translateX(0); }
+
+  .cart-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #f0ebe3;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .cart-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    color: var(--text);
+  }
+  .cart-close {
+    background: var(--sand);
+    border: none;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .2s;
+  }
+  .cart-close:hover { background: #e0d8cc; }
+
+  #cart-items { flex: 1; overflow-y: auto; padding: 1.25rem 1.5rem; }
+
+  .cart-item {
+    padding: .875rem 0;
+    border-bottom: 1px solid #f0ebe3;
+  }
+  .cart-item:last-child { border-bottom: none; }
+  .cart-item-name { font-weight: 500; font-size: .95rem; margin-bottom: .3rem; }
+  .cart-item-meta { font-size: .8rem; color: var(--muted); margin-bottom: .5rem; }
+
+  .qty-row {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+  .qty-btn {
+    width: 28px; height: 28px;
+    border: 1.5px solid #d8d0c6;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color .2s, background .2s;
+    line-height: 1;
+  }
+  .qty-btn:hover { border-color: var(--green); background: var(--green-light); }
+  .qty-num { font-weight: 600; font-size: .95rem; min-width: 24px; text-align: center; }
+  .remove-btn {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: #b0a898;
+    cursor: pointer;
+    font-size: .8rem;
+    padding: .25rem .5rem;
+    border-radius: .5rem;
+    transition: color .2s, background .2s;
+  }
+  .remove-btn:hover { color: var(--badge-red); background: #fdecea; }
+  .cart-item-price { font-weight: 600; font-size: .95rem; margin-top: .5rem; color: var(--green); }
+
+  .cart-footer {
+    padding: 1.25rem 1.5rem;
+    border-top: 1px solid #f0ebe3;
+    background: var(--cream);
+  }
+  .cart-total-row {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+    font-size: 1.05rem;
+    margin-bottom: 1rem;
+  }
+  .cart-total-amount { color: var(--green); }
+
+  /* ── BUTTONS ───────────────────────────── */
+  .btn-primary {
+    font-family: 'DM Sans', sans-serif;
+    font-size: .95rem;
+    font-weight: 500;
+    background: var(--green);
+    color: #fff;
+    border: none;
+    padding: .75rem 1.5rem;
+    border-radius: 2rem;
+    cursor: pointer;
+    transition: background .2s, transform .15s, box-shadow .2s;
+    letter-spacing: .01em;
+  }
+  .btn-primary:hover {
+    background: var(--green-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(29,107,58,.3);
+  }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary.full { width: 100%; }
+
+  .btn-outline {
+    font-family: 'DM Sans', sans-serif;
+    font-size: .9rem;
+    background: transparent;
+    color: var(--green);
+    border: 2px solid var(--green);
+    padding: .65rem 1.4rem;
+    border-radius: 2rem;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .btn-outline:hover { background: var(--green); color: #fff; }
+
+  /* ── HOME HERO ─────────────────────────── */
+  #home-page {
+    position: relative;
+    min-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 4rem 2rem 3.5rem;
+    background: url('images/home-banner.jpg') center/cover no-repeat;
+    overflow: hidden;
+    border-radius: 0 0 2rem 2rem;
+    margin: 0 -1rem;
+  }
+
+  #home-page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(10,30,15,.75) 0%, rgba(10,30,15,.25) 55%, transparent 100%);
+    border-radius: 0 0 2rem 2rem;
+  }
+
+  .hero-content {
+    position: relative;
+    max-width: 600px;
+    color: #fff;
+  }
+  .hero-eyebrow {
+    font-size: .8rem;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: rgba(255,255,255,.75);
+    margin-bottom: .75rem;
+  }
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.12;
+    margin-bottom: 1rem;
+  }
+  .hero-subtitle {
+    font-size: 1rem;
+    color: rgba(255,255,255,.85);
+    margin-bottom: 2rem;
+    max-width: 400px;
+    line-height: 1.6;
+  }
+  .hero-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem;
+    margin-bottom: 2rem;
+  }
+  .hero-badge {
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.3);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    font-size: .78rem;
+    font-weight: 500;
+    padding: .35rem .8rem;
+    border-radius: 2rem;
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+  }
+
+  /* ── TRUST BAR ─────────────────────────── */
+  .trust-bar {
+    background: var(--green);
+    color: #fff;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem 3rem;
+    padding: 1.1rem 2rem;
+    font-size: .82rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .trust-item { display: flex; align-items: center; gap: .5rem; opacity: .9; }
+  .trust-item span { font-size: 1rem; }
+
+  /* ── SECTION TITLES ────────────────────── */
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: .4rem;
+  }
+  .section-sub {
+    font-size: .9rem;
+    color: var(--muted);
+    margin-bottom: 2.5rem;
+  }
+
+  /* ── SHOP ──────────────────────────────── */
+  #shop-page { padding: 2.5rem 0; }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .product-card {
+    background: var(--white);
+    border-radius: 1.25rem;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: transform .25s, box-shadow .25s;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  .product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .product-img-wrap {
+    position: relative;
+    overflow: hidden;
+    height: 190px;
+    background: var(--sand);
+  }
+  .product-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .4s ease;
+  }
+  .product-card:hover .product-img { transform: scale(1.04); }
+
   .badge {
-    position:absolute;
-    top:0.5rem;
-    left:0.5rem;
-    background:#FF3030;
-    color:white;
-    font-size:0.75rem;
-    font-weight:600;
-    padding:0.25rem 0.5rem;
-    border-radius:0.25rem;
+    position: absolute;
+    top: .75rem;
+    left: .75rem;
+    background: var(--badge-red);
+    color: #fff;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: .3rem .65rem;
+    border-radius: 2rem;
+    z-index: 2;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  }
+
+  .product-body {
+    padding: 1.25rem 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .product-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: .35rem;
+    color: var(--text);
+  }
+  .product-desc {
+    font-size: .85rem;
+    color: var(--muted);
+    line-height: 1.55;
+    flex: 1;
+    margin-bottom: 1rem;
+  }
+  .product-price {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--green);
+    margin-bottom: 1rem;
+  }
+  .product-price-label {
+    font-size: .8rem;
+    font-weight: 400;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .size-select {
+    width: 100%;
+    border: 1.5px solid #e0d8cc;
+    padding: .55rem .85rem;
+    border-radius: .6rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .9rem;
+    color: var(--text);
+    background: var(--cream);
+    cursor: pointer;
+    margin-bottom: .875rem;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b6255' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right .7rem center;
+    padding-right: 2rem;
+  }
+  .size-select:focus { outline: none; border-color: var(--green); }
+
+  /* ── CONTACT ───────────────────────────── */
+  #contact-page { padding: 2.5rem 0; max-width: 520px; }
+
+  .form-group { margin-bottom: 1rem; }
+  .form-label {
+    display: block;
+    font-size: .8rem;
+    font-weight: 500;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: .4rem;
+  }
+  .form-input,
+  .form-textarea {
+    width: 100%;
+    border: 1.5px solid #e0d8cc;
+    border-radius: .75rem;
+    padding: .75rem 1rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .95rem;
+    color: var(--text);
+    background: var(--white);
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .form-input:focus,
+  .form-textarea:focus {
+    outline: none;
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(29,107,58,.12);
+  }
+  .form-textarea { min-height: 130px; resize: vertical; }
+
+  .success-msg {
+    display: none;
+    background: var(--green-light);
+    border: 1px solid rgba(29,107,58,.25);
+    color: var(--green-dark);
+    font-weight: 500;
+    padding: .875rem 1.25rem;
+    border-radius: .75rem;
+    margin-top: 1rem;
+  }
+  .success-msg.show { display: flex; align-items: center; gap: .5rem; }
+
+  /* ── CHECKOUT ──────────────────────────── */
+  #checkout-page { padding: 2.5rem 0; max-width: 640px; }
+
+  .checkout-card {
+    background: var(--white);
+    border-radius: 1.25rem;
+    padding: 1.75rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 1.5rem;
+  }
+  .checkout-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1.25rem;
+    color: var(--text);
+  }
+
+  .summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .6rem 0;
+    border-bottom: 1px dashed #e8e0d5;
+    font-size: .9rem;
+  }
+  .summary-item:last-child { border-bottom: none; }
+  .summary-total {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+    font-size: 1.05rem;
+    padding-top: .75rem;
+    margin-top: .25rem;
+    border-top: 2px solid var(--text);
+  }
+  .summary-total-amount { color: var(--green); }
+
+  .payment-options { display: flex; gap: 1rem; margin-top: .5rem; }
+  .payment-label {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    background: var(--cream);
+    border: 2px solid #e0d8cc;
+    padding: .7rem 1.2rem;
+    border-radius: .75rem;
+    cursor: pointer;
+    font-size: .9rem;
+    font-weight: 500;
+    transition: border-color .2s, background .2s;
+    flex: 1;
+    justify-content: center;
+  }
+  .payment-label:has(input:checked) {
+    border-color: var(--green);
+    background: var(--green-light);
+    color: var(--green-dark);
+  }
+  .payment-label input { display: none; }
+
+  /* ── FOOTER ────────────────────────────── */
+  footer {
+    background: var(--green-dark);
+    color: rgba(255,255,255,.85);
+    margin-top: auto;
+  }
+  .footer-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 3rem 2rem 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 2rem;
+  }
+  .footer-brand {
+    grid-column: 1 / -1;
+  }
+  @media (min-width: 600px) {
+    .footer-brand { grid-column: auto; }
+  }
+  .footer-logo {
+    height: 48px;
+    filter: brightness(0) invert(1);
+    margin-bottom: .75rem;
+    opacity: .9;
+  }
+  .footer-tagline {
+    font-size: .85rem;
+    line-height: 1.6;
+    opacity: .7;
+    max-width: 220px;
+  }
+  .footer-col h4 {
+    font-size: .7rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.5);
+    margin-bottom: .875rem;
+    font-weight: 600;
+  }
+  .footer-col p, .footer-col a {
+    font-size: .85rem;
+    line-height: 1.85;
+    color: rgba(255,255,255,.75);
+    display: block;
+    text-decoration: none;
+  }
+  .footer-col a:hover { color: #fff; }
+  .footer-bottom {
+    text-align: center;
+    font-size: .78rem;
+    color: rgba(255,255,255,.4);
+    padding: 1.25rem 2rem;
+    border-top: 1px solid rgba(255,255,255,.1);
+  }
+
+  /* ── MAIN WRAPPER ──────────────────────── */
+  main {
+    flex: 1;
+    padding: 0 1.25rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  /* ── HIDDEN ────────────────────────────── */
+  .hidden { display: none !important; }
+
+  /* ── ANIMATIONS ────────────────────────── */
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .animate-in { animation: slideUp .4s ease both; }
+
+  /* ── RESPONSIVE ────────────────────────── */
+  @media (max-width: 500px) {
+    #home-page { min-height: 70vh; margin: 0 -.5rem; border-radius: 0 0 1.5rem 1.5rem; }
+    .hero-title { font-size: 1.9rem; }
+    .trust-bar { gap: .75rem 2rem; font-size: .76rem; }
+    .nav-btn { padding: .4rem .65rem; font-size: .8rem; }
   }
 </style>
 </head>
 
-<body class="bg-gray-50 min-h-screen flex flex-col">
+<body>
 
 <!-- HEADER -->
-<header class="bg-white shadow sticky top-0 z-50 p-3 flex justify-between items-center">
-
-  <!-- LOGO (KLICK → HOME) -->
-  <img src="images/logo-new.png"
-       alt="Savoldi Freiland"
-       class="logo-img cursor-pointer"
-       onclick="showPage('home')">
-
-  <nav class="flex gap-2 sm:gap-3 items-center">
-    <button onclick="showPage('home')" class="btn-green px-3 py-1 rounded">Home</button>
-    <button onclick="showPage('shop')" class="btn-green px-3 py-1 rounded">Shop</button>
-    <button onclick="showPage('contact')" class="btn-green px-3 py-1 rounded">Kontakt</button>
-
-    <button onclick="toggleCart()"
-      class="relative btn-green btn-cart px-2 py-1 rounded"
-      aria-label="Warenkorb öffnen">
+<header>
+  <img src="images/logo-new.png" alt="Savoldi Freiland" class="logo-img" onclick="showPage('home')">
+  <nav>
+    <button class="nav-btn active" id="nav-home" onclick="showPage('home')">Home</button>
+    <button class="nav-btn" id="nav-shop" onclick="showPage('shop')">Shop</button>
+    <button class="nav-btn" id="nav-contact" onclick="showPage('contact')">Kontakt</button>
+    <button class="cart-btn" onclick="toggleCart()" aria-label="Warenkorb öffnen">
       🛒
-      <span id="cart-count"
-        class="absolute -top-2 -right-2 bg-white text-[#008231] text-xs w-5 h-5 rounded-full flex items-center justify-center">
-        0
-      </span>
+      <span id="cart-count">0</span>
     </button>
   </nav>
 </header>
 
-<!-- CART -->
-<div id="cart-overlay" class="hidden fixed inset-0 bg-black/40 z-40" onclick="toggleCart()"></div>
+<!-- CART OVERLAY -->
+<div id="cart-overlay" onclick="toggleCart()"></div>
 
-<div id="cart"
-  class="fixed right-0 top-0 w-11/12 sm:w-80 h-full bg-white shadow-lg z-50 transform translate-x-full transition p-5 flex flex-col">
-  <h2 class="text-xl font-semibold mb-4">Warenkorb</h2>
-  <div id="cart-items" class="flex-1 space-y-3 overflow-y-auto"></div>
-  <div class="border-t pt-3 font-semibold">Gesamt: CHF <span id="cart-total">0.00</span></div>
-  <button onclick="checkout()" class="btn-green mt-4 py-2 rounded">Zur Kasse</button>
+<!-- CART DRAWER -->
+<div id="cart">
+  <div class="cart-header">
+    <h2>Warenkorb</h2>
+    <button class="cart-close" onclick="toggleCart()">✕</button>
+  </div>
+  <div id="cart-items"></div>
+  <div class="cart-footer">
+    <div class="cart-total-row">
+      <span>Gesamt</span>
+      <span class="cart-total-amount">CHF <span id="cart-total">0.00</span></span>
+    </div>
+    <button class="btn-primary full" onclick="checkout()">Zur Kasse →</button>
+  </div>
 </div>
 
 <!-- MAIN -->
-<main class="flex-1 p-4 sm:p-6 space-y-12">
+<main>
 
-<!-- HOME -->
-<section id="home-page"
-  class="relative text-white text-center h-96 flex flex-col justify-center items-center"
-  style="background-image:url('images/home-banner.jpg'); background-size:cover; background-position:center;">
-  <h2 class="text-4xl font-bold mb-3 drop-shadow-lg">Frische Freilandeier</h2>
-  <p class="text-lg mb-6 drop-shadow-md">Regional, nachhaltig & persönlich</p>
-  <button class="btn-green px-6 py-3 rounded" onclick="showPage('shop')">Jetzt bestellen</button>
-</section>
-
-<!-- SHOP -->
-<section id="shop-page" class="hidden">
-  <h2 class="text-2xl font-semibold mb-6">Unsere Produkte</h2>
-  <div id="products" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-</section>
-
-<!-- CONTACT -->
-<section id="contact-page" class="hidden max-w-md mx-auto">
-  <h2 class="text-2xl font-semibold mb-4">Kontakt</h2>
-  <form id="contact-form" action="https://formspree.io/f/FORM_CONTACT_ID" method="POST" class="space-y-3">
-    <input name="name" placeholder="Name" required class="w-full border p-2 rounded">
-    <input name="email" type="email" placeholder="E-Mail" required class="w-full border p-2 rounded">
-    <textarea name="message" placeholder="Nachricht" required class="w-full border p-2 rounded"></textarea>
-    <button class="btn-green w-full py-2 rounded">Absenden</button>
-  </form>
-  <div id="contact-success" class="hidden text-[#008231] mt-2 font-semibold">
-    Vielen Dank für deine Anfrage!
-  </div>
-</section>
-
-<!-- CHECKOUT -->
-<section id="checkout-page" class="hidden max-w-2xl mx-auto space-y-6">
-  <h2 class="text-2xl font-semibold">Checkout</h2>
-
-  <div class="bg-white p-4 rounded shadow">
-    <h3 class="font-semibold mb-3">Bestellübersicht</h3>
-    <div id="checkout-summary" class="space-y-2"></div>
-    <div class="border-t mt-3 pt-2 flex justify-between font-semibold">
-      <span>Gesamt</span>
-      <span>CHF <span id="checkout-total">0.00</span></span>
+  <!-- HOME -->
+  <section id="home-page">
+    <div style="position:relative; z-index:1;">
+      <div class="hero-content animate-in">
+        <p class="hero-eyebrow">🌿 Freilandhaltung · Othmarsingen</p>
+        <h1 class="hero-title">Frische Eier,<br>direkt vom Hof.</h1>
+        <p class="hero-subtitle">Regional, nachhaltig & persönlich — täglich frisch für Sie und Ihre Familie.</p>
+        <div class="hero-badges">
+          <span class="hero-badge">🥚 Täglich frisch</span>
+          <span class="hero-badge">🌱 Freilandhaltung</span>
+          <span class="hero-badge">🚚 Direktlieferung</span>
+        </div>
+        <button class="btn-primary" onclick="showPage('shop')">Jetzt bestellen →</button>
+      </div>
     </div>
+  </section>
+
+  <!-- TRUST BAR -->
+  <div class="trust-bar" id="trust-bar" style="margin:0 -1.25rem; display:none;">
+    <span class="trust-item"><span>🥚</span> Täglich frisch gesammelt</span>
+    <span class="trust-item"><span>🌿</span> Artgerechte Freilandhaltung</span>
+    <span class="trust-item"><span>📍</span> Aus Othmarsingen, Aargau</span>
+    <span class="trust-item"><span>💚</span> Ohne Zwischenhändler</span>
   </div>
 
-  <form id="checkout-form" action="https://formspree.io/f/FORM_CHECKOUT_ID" method="POST" class="space-y-3">
-    <input name="name" placeholder="Name" required class="w-full border p-2 rounded">
-    <input name="email" type="email" placeholder="E-Mail" required class="w-full border p-2 rounded">
-    <input name="address" placeholder="Adresse" required class="w-full border p-2 rounded">
-
-    <div class="flex gap-4">
-      <label><input type="radio" name="payment" value="TWINT" checked> TWINT</label>
-      <label><input type="radio" name="payment" value="Rechnung"> Rechnung</label>
+  <!-- SHOP -->
+  <section id="shop-page" class="hidden">
+    <div style="padding-top:2.5rem">
+      <h2 class="section-title">Unsere Produkte</h2>
+      <p class="section-sub">Frische Freilandeier in verschiedenen Grössen — direkt vom Hof zu Ihnen.</p>
+      <div class="products-grid" id="products"></div>
     </div>
+  </section>
 
-    <textarea name="order" id="order-field" class="hidden"></textarea>
-    <button class="btn-green w-full py-2 rounded">Bestellung abschicken</button>
-  </form>
+  <!-- CONTACT -->
+  <section id="contact-page" class="hidden">
+    <div style="padding-top:2.5rem">
+      <h2 class="section-title">Kontakt</h2>
+      <p class="section-sub">Fragen, Feedback oder eine spezielle Bestellung? Wir freuen uns von Ihnen zu hören.</p>
+      <form id="contact-form" action="https://formspree.io/f/FORM_CONTACT_ID" method="POST">
+        <div class="form-group">
+          <label class="form-label">Name</label>
+          <input name="name" placeholder="Ihr Name" required class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label">E-Mail</label>
+          <input name="email" type="email" placeholder="ihre@email.ch" required class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nachricht</label>
+          <textarea name="message" placeholder="Ihre Nachricht…" required class="form-textarea"></textarea>
+        </div>
+        <button class="btn-primary" type="submit">Nachricht senden →</button>
+      </form>
+      <div id="contact-success" class="success-msg">
+        <span>✅</span> Vielen Dank für Ihre Anfrage! Wir melden uns bald.
+      </div>
+    </div>
+  </section>
 
-  <div id="checkout-success" class="hidden text-[#008231] font-semibold mt-2">
-    Vielen Dank für deine Bestellung!
-  </div>
-</section>
+  <!-- CHECKOUT -->
+  <section id="checkout-page" class="hidden">
+    <div style="padding-top:2.5rem">
+      <h2 class="section-title">Checkout</h2>
+      <p class="section-sub">Bitte prüfen Sie Ihre Bestellung und geben Sie Ihre Daten ein.</p>
+
+      <div class="checkout-card">
+        <h3>Bestellübersicht</h3>
+        <div id="checkout-summary"></div>
+        <div class="summary-total">
+          <span>Gesamt</span>
+          <span class="summary-total-amount">CHF <span id="checkout-total">0.00</span></span>
+        </div>
+      </div>
+
+      <div class="checkout-card">
+        <h3>Ihre Angaben</h3>
+        <form id="checkout-form" action="https://formspree.io/f/FORM_CHECKOUT_ID" method="POST">
+          <div class="form-group">
+            <label class="form-label">Name</label>
+            <input name="name" placeholder="Ihr Name" required class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">E-Mail</label>
+            <input name="email" type="email" placeholder="ihre@email.ch" required class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Adresse</label>
+            <input name="address" placeholder="Strasse, PLZ, Ort" required class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Zahlungsmethode</label>
+            <div class="payment-options">
+              <label class="payment-label">
+                <input type="radio" name="payment" value="TWINT" checked>
+                📱 TWINT
+              </label>
+              <label class="payment-label">
+                <input type="radio" name="payment" value="Rechnung">
+                🧾 Rechnung
+              </label>
+            </div>
+          </div>
+          <textarea name="order" id="order-field" class="hidden"></textarea>
+          <button class="btn-primary full" type="submit">Bestellung abschicken →</button>
+        </form>
+        <div id="checkout-success" class="success-msg">
+          <span>✅</span> Vielen Dank für Ihre Bestellung! Wir melden uns in Kürze.
+        </div>
+      </div>
+    </div>
+  </section>
 
 </main>
 
 <!-- FOOTER -->
-<footer class="bg-[#008231] text-white p-6 text-sm">
-  <div class="max-w-4xl mx-auto grid sm:grid-cols-3 gap-6">
-    <div>
-      <h4 class="font-semibold flex items-center gap-1"><i data-feather="home"></i> Über uns</h4>
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="images/logo-new.png" alt="Savoldi Freiland" class="footer-logo">
+      <p class="footer-tagline">Frische Freilandeier aus artgerechter Haltung — direkt vom Hof in Othmarsingen.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Adresse</h4>
       <p>Savoldi Freiland</p>
       <p>Ebnet 15</p>
       <p>5504 Othmarsingen</p>
     </div>
-    <div>
-      <h4 class="font-semibold flex items-center gap-1"><i data-feather="mail"></i> Kontakt</h4>
-      <p>info@savoldi-freiland.ch</p>
-      <p>+41 79 797 79 79</p>
+    <div class="footer-col">
+      <h4>Kontakt</h4>
+      <a href="mailto:info@savoldi-freiland.ch">info@savoldi-freiland.ch</a>
+      <a href="tel:+41797977979">+41 79 797 79 79</a>
     </div>
-    <div>
-      <h4 class="font-semibold flex items-center gap-1"><i data-feather="clock"></i> Öffnungszeiten</h4>
-      <p>Mo–Fr: 8:00 – 18:00 Uhr</p>
+    <div class="footer-col">
+      <h4>Öffnungszeiten</h4>
+      <p>Mo–Fr: 8:00–18:00 Uhr</p>
       <p>Sa–So: Geschlossen</p>
     </div>
-    <div>
-      <h4 class="font-semibold flex items-center gap-1"><i data-feather="credit-card"></i> Zahlung</h4>
-      <p>- Rechnung</p>
-      <p>- TWINT</p>
+    <div class="footer-col">
+      <h4>Zahlung</h4>
+      <p>📱 TWINT</p>
+      <p>🧾 Rechnung</p>
     </div>
   </div>
-  <p class="text-center mt-4">© 2026 Savoldi Freiland · realisiert von TwoNet</p>
+  <div class="footer-bottom">© 2026 Savoldi Freiland · realisiert von TwoNet</div>
 </footer>
 
 <script>
@@ -191,113 +858,169 @@ feather.replace();
 let cart = [];
 
 const products = [
-  { id:4, name:'Eierabo', price:null, desc:'Jede Woche frische Freilandeier direkt zu dir nach Haus geliefert.', img:'images/eier-abo.jpg', onRequest:true, badge:'Beliebt' },
-  { id:1, name:'6er-Packung Freilandeier', price:4.5, desc:'Frisch vom Hof – täglich genießen.', img:'images/eier-6er.jpg' },
-  { id:2, name:'10er-Packung Freilandeier', price:7, desc:'Perfekt für die Familie.', img:'images/eier-10er.jpg' },
+  { id:4, name:'Eierabo', price:null, desc:'Jede Woche frische Freilandeier direkt zu dir nach Hause geliefert.', img:'images/eier-abo.jpg', onRequest:true, badge:'Beliebt' },
+  { id:1, name:'6er-Packung Freilandeier', price:4.5, desc:'Frisch vom Hof – täglich geniessen.', img:'images/eier-6er.jpg' },
+  { id:2, name:'10er-Packung Freilandeier', price:7, desc:'Perfekt für die ganze Familie.', img:'images/eier-10er.jpg' },
   { id:3, name:'30er-Packung Freilandeier', price:19.5, desc:'Vorteilspackung für grosse Haushalte.', img:'images/eier-30er.jpg' }
 ];
 
 const productsEl = document.getElementById('products');
 
-products.forEach(p=>{
-  const div=document.createElement('div');
-  div.className='bg-white p-4 rounded shadow relative';
-  div.innerHTML=`
-    ${p.badge?`<div class="badge">${p.badge}</div>`:''}
-    <img src="${p.img}" alt="${p.name}" class="product-img mb-3" onerror="this.src='images/placeholder.jpg'">
-    <h3 class="font-semibold">${p.name}</h3>
-    <p class="text-gray-600 text-sm mb-2">${p.desc}</p>
-    ${p.onRequest?`
-      <label class="text-sm">Grösse:</label>
-      <select id="size-${p.id}" class="w-full border p-1 rounded mb-2">
-        <option>6er</option><option>10er</option><option>30er</option>
-      </select>
-      <p class="text-[#008231] font-semibold mb-2">Preis auf Anfrage</p>
-      <button class="btn-green w-full py-2 rounded" onclick="addAbo(${p.id})">Abo anfragen</button>
-    `:`
-      <p class="font-semibold mb-2">CHF ${p.price.toFixed(2)}</p>
-      <button class="btn-green w-full py-2 rounded" onclick="addToCart(${p.id})">In den Warenkorb</button>
-    `}
+products.forEach(p => {
+  const div = document.createElement('div');
+  div.className = 'product-card';
+  div.innerHTML = `
+    <div class="product-img-wrap">
+      ${p.badge ? `<div class="badge">${p.badge}</div>` : ''}
+      <img src="${p.img}" alt="${p.name}" class="product-img" onerror="this.src='images/placeholder.jpg'">
+    </div>
+    <div class="product-body">
+      <h3 class="product-name">${p.name}</h3>
+      <p class="product-desc">${p.desc}</p>
+      ${p.onRequest ? `
+        <label class="form-label">Grösse wählen</label>
+        <select id="size-${p.id}" class="size-select">
+          <option>6er</option>
+          <option>10er</option>
+          <option>30er</option>
+        </select>
+        <span class="product-price-label">Preis auf Anfrage</span>
+        <button class="btn-primary" onclick="addAbo(${p.id})">Abo anfragen →</button>
+      ` : `
+        <div class="product-price">CHF ${p.price.toFixed(2)}</div>
+        <button class="btn-primary" onclick="addToCart(${p.id})">In den Warenkorb</button>
+      `}
+    </div>
   `;
   productsEl.appendChild(div);
 });
 
-function showPage(p){
-  ['home','shop','contact','checkout'].forEach(x=>document.getElementById(x+'-page').classList.add('hidden'));
-  document.getElementById(p+'-page').classList.remove('hidden');
+// Page navigation
+const pages = ['home','shop','contact','checkout'];
+
+function showPage(p) {
+  pages.forEach(x => {
+    document.getElementById(x + '-page').classList.add('hidden');
+    const navBtn = document.getElementById('nav-' + x);
+    if (navBtn) navBtn.classList.remove('active');
+  });
+  document.getElementById(p + '-page').classList.remove('hidden');
+  const activeBtn = document.getElementById('nav-' + p);
+  if (activeBtn) activeBtn.classList.add('active');
+
+  // Show trust bar only on home
+  const tb = document.getElementById('trust-bar');
+  tb.style.display = (p === 'home') ? 'flex' : 'none';
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-const cartEl=document.getElementById('cart');
-const overlay=document.getElementById('cart-overlay');
+// Show trust bar on initial load
+document.getElementById('trust-bar').style.display = 'flex';
 
-function toggleCart(){
-  cartEl.classList.toggle('translate-x-full');
-  overlay.classList.toggle('hidden');
+// Cart
+const cartEl = document.getElementById('cart');
+const overlay = document.getElementById('cart-overlay');
+
+function toggleCart() {
+  cartEl.classList.toggle('open');
+  overlay.classList.toggle('show');
 }
 
-function addToCart(id){
-  const p=products.find(x=>x.id===id);
-  const e=cart.find(x=>x.id===id);
-  e ? e.qty++ : cart.push({...p,qty:1});
+function addToCart(id) {
+  const p = products.find(x => x.id === id);
+  const e = cart.find(x => x.id === id);
+  e ? e.qty++ : cart.push({...p, qty:1});
   renderCart();
   toggleCart();
 }
 
-function addAbo(id){
-  const size=document.getElementById(`size-${id}`).value;
-  cart.push({id,name:'Eierabo',size,qty:1,price:null});
+function addAbo(id) {
+  const size = document.getElementById(`size-${id}`).value;
+  cart.push({id, name:'Eierabo', size, qty:1, price:null});
   renderCart();
   toggleCart();
 }
 
-function changeQty(index,delta){
-  cart[index].qty+=delta;
-  if(cart[index].qty<=0) cart.splice(index,1);
+function changeQty(index, delta) {
+  cart[index].qty += delta;
+  if (cart[index].qty <= 0) cart.splice(index, 1);
   renderCart();
 }
 
-function removeItem(index){
-  cart.splice(index,1);
+function removeItem(index) {
+  cart.splice(index, 1);
   renderCart();
 }
 
-function renderCart(){
-  let total=0;
-  const el=document.getElementById('cart-items');
-  el.innerHTML='';
+function renderCart() {
+  let total = 0;
+  const el = document.getElementById('cart-items');
+  el.innerHTML = '';
 
-  cart.forEach((i,index)=>{
-    if(i.price) total+=i.price*i.qty;
-
-    el.innerHTML+=`
-      <div class="border-b pb-2 space-y-1">
-        <strong>${i.name}</strong>
-
-        ${i.size?`
-          <div class="text-sm text-gray-500">Grösse: ${i.size}, wöchentlich</div>
-        `:`
-          <div class="flex items-center gap-2">
-            <button onclick="changeQty(${index},-1)" class="px-2 border rounded">−</button>
-            <span>${i.qty}</span>
-            <button onclick="changeQty(${index},1)" class="px-2 border rounded">+</button>
-            <button onclick="removeItem(${index})" class="ml-auto text-red-500 text-sm">🗑️ Entfernen</button>
-          </div>
-        `}
-
-        <div>
-          ${i.price
-            ? `CHF ${(i.price*i.qty).toFixed(2)}`
-            : `<span class="text-[#008231]">Preis auf Anfrage</span>`
+  if (cart.length === 0) {
+    el.innerHTML = `<div style="text-align:center; color:var(--muted); padding:2.5rem 1rem; font-size:.9rem;">
+      <div style="font-size:2.5rem; margin-bottom:.75rem;">🥚</div>
+      Ihr Warenkorb ist noch leer.
+    </div>`;
+  } else {
+    cart.forEach((item, index) => {
+      if (item.price) total += item.price * item.qty;
+      el.innerHTML += `
+        <div class="cart-item">
+          <div class="cart-item-name">${item.name}</div>
+          ${item.size
+            ? `<div class="cart-item-meta">Grösse: ${item.size} · wöchentlich</div>`
+            : `<div class="qty-row">
+                <button class="qty-btn" onclick="changeQty(${index},-1)">−</button>
+                <span class="qty-num">${item.qty}</span>
+                <button class="qty-btn" onclick="changeQty(${index},1)">+</button>
+                <button class="remove-btn" onclick="removeItem(${index})">Entfernen</button>
+              </div>`
           }
+          <div class="cart-item-price">
+            ${item.price
+              ? `CHF ${(item.price * item.qty).toFixed(2)}`
+              : `<span style="color:var(--green); font-size:.85rem; font-weight:500;">Preis auf Anfrage</span>`
+            }
+          </div>
         </div>
+      `;
+    });
+  }
+
+  document.getElementById('cart-total').textContent = total.toFixed(2);
+  document.getElementById('cart-count').textContent = cart.reduce((a,b) => a + b.qty, 0);
+}
+
+// Checkout
+function checkout() {
+  toggleCart();
+
+  const summaryEl = document.getElementById('checkout-summary');
+  summaryEl.innerHTML = '';
+  let total = 0;
+
+  cart.forEach(item => {
+    if (item.price) total += item.price * item.qty;
+    summaryEl.innerHTML += `
+      <div class="summary-item">
+        <span>${item.name}${item.size ? ` (${item.size})` : ` × ${item.qty}`}</span>
+        <span>${item.price ? `CHF ${(item.price * item.qty).toFixed(2)}` : 'Auf Anfrage'}</span>
       </div>
     `;
   });
 
-  document.getElementById('cart-total').textContent=total.toFixed(2);
-  document.getElementById('cart-count').textContent=cart.reduce((a,b)=>a+b.qty,0);
-}
-</script>
+  document.getElementById('checkout-total').textContent = total.toFixed(2);
+  document.getElementById('order-field').value = cart.map(i =>
+    `${i.name}${i.size ? ' ('+i.size+')' : ' x'+i.qty}: ${i.price ? 'CHF '+(i.price*i.qty).toFixed(2) : 'Anfrage'}`
+  ).join('\n');
 
+  showPage('checkout');
+}
+
+// Initial render
+renderCart();
+</script>
 </body>
 </html>
