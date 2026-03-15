@@ -53,17 +53,18 @@ body::before{
 /* Floating egg decorations */
 .egg-bg{
   position:fixed;
-  font-size:clamp(3rem,6vw,6rem);
-  opacity:.04;
+  font-size:clamp(4rem,7vw,8rem);
+  opacity:.18;
   pointer-events:none;
   z-index:0;
   animation:float linear infinite;
+  filter:drop-shadow(0 4px 12px rgba(0,0,0,.08));
 }
-.egg-bg:nth-child(1){top:8%;left:5%;animation-duration:18s;animation-delay:0s;font-size:clamp(2rem,4vw,4.5rem)}
-.egg-bg:nth-child(2){top:20%;right:8%;animation-duration:22s;animation-delay:-6s;font-size:clamp(3rem,5vw,5rem)}
-.egg-bg:nth-child(3){bottom:15%;left:12%;animation-duration:16s;animation-delay:-11s}
-.egg-bg:nth-child(4){bottom:25%;right:6%;animation-duration:20s;animation-delay:-3s;font-size:clamp(2rem,3.5vw,4rem)}
-.egg-bg:nth-child(5){top:50%;left:2%;animation-duration:24s;animation-delay:-8s;font-size:clamp(1.5rem,2.5vw,3rem)}
+.egg-bg:nth-child(1){top:8%;left:5%;animation-duration:18s;animation-delay:0s;font-size:clamp(3.5rem,6vw,7rem)}
+.egg-bg:nth-child(2){top:15%;right:7%;animation-duration:22s;animation-delay:-6s;font-size:clamp(4.5rem,7vw,9rem)}
+.egg-bg:nth-child(3){bottom:12%;left:10%;animation-duration:16s;animation-delay:-11s;font-size:clamp(4rem,6.5vw,8rem)}
+.egg-bg:nth-child(4){bottom:20%;right:5%;animation-duration:20s;animation-delay:-3s;font-size:clamp(3rem,5vw,6.5rem)}
+.egg-bg:nth-child(5){top:48%;left:1%;animation-duration:24s;animation-delay:-8s;font-size:clamp(2.5rem,4vw,5rem)}
 
 @keyframes float{
   0%{transform:translateY(0) rotate(0deg)}
@@ -283,12 +284,5 @@ body::before{
 
   <p class="foot-note">
     Fragen? Schreiben Sie uns:<br>
-    <a href="mailto:info@savoldi-freiland.ch" style="color:var(--g600);text-decoration:none">info@savoldi-freiland.ch</a>
-    &nbsp;·&nbsp;
-    <a href="tel:+41797977979" style="color:var(--g600);text-decoration:none">+41 79 797 79 79</a>
-  </p>
-
-</div>
-
-</body>
-</html>
+    <a href="/cdn-cgi/l/email-protection#553c3b333a152634233a39313c783327303c39343b317b363d" style="color:var(--g600);text-decoration:none"><span class="__cf_email__" data-cfemail="e1888f878ea19280978e8d8588cc879384888d808f85cf8289">[email&#160;protected]</span></a>
+    &
