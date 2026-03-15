@@ -63,6 +63,28 @@ button{font-family:inherit;cursor:pointer}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-thumb{background:var(--sand2);border-radius:2px}
 
+/* ── FLOATING EGGS ──────────────────────────── */
+.egg-bg{
+  position:fixed;
+  pointer-events:none;
+  z-index:0;
+  opacity:.18;
+  filter:drop-shadow(0 4px 12px rgba(0,0,0,.08));
+  animation:eggFloat linear infinite;
+}
+.egg-bg:nth-child(1){font-size:clamp(3.5rem,6vw,7rem);top:8%;left:5%;animation-duration:18s;animation-delay:0s}
+.egg-bg:nth-child(2){font-size:clamp(4.5rem,7vw,9rem);top:15%;right:7%;animation-duration:22s;animation-delay:-6s}
+.egg-bg:nth-child(3){font-size:clamp(4rem,6.5vw,8rem);bottom:12%;left:10%;animation-duration:16s;animation-delay:-11s}
+.egg-bg:nth-child(4){font-size:clamp(3rem,5vw,6.5rem);bottom:20%;right:5%;animation-duration:20s;animation-delay:-3s}
+.egg-bg:nth-child(5){font-size:clamp(2.5rem,4vw,5rem);top:48%;left:1%;animation-duration:24s;animation-delay:-8s}
+
+@keyframes eggFloat{
+  0%{transform:translateY(0) rotate(0deg)}
+  33%{transform:translateY(-18px) rotate(6deg)}
+  66%{transform:translateY(8px) rotate(-4deg)}
+  100%{transform:translateY(0) rotate(0deg)}
+}
+
 /* ── ANIMATIONS ─────────────────────────────── */
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes riseUp{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:none}}
@@ -480,6 +502,13 @@ footer{background:var(--g700);margin-top:clamp(3rem,8vh,6rem)}
 </style>
 </head>
 <body>
+
+<!-- Floating egg decorations -->
+<div class="egg-bg" aria-hidden="true">🥚</div>
+<div class="egg-bg" aria-hidden="true">🥚</div>
+<div class="egg-bg" aria-hidden="true">🥚</div>
+<div class="egg-bg" aria-hidden="true">🥚</div>
+<div class="egg-bg" aria-hidden="true">🥚</div>
 
 <header>
   <div class="logo-wrap" onclick="showPage('home')" role="button" aria-label="Startseite">
