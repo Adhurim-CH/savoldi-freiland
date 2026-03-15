@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Vielen Dank für Ihre Bestellung bei Savoldi Freiland.">
+<title>Danke für Ihre Bestellung – Savoldi Freiland</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600;1,700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --g700:#14532d;--g600:#166534;--g500:#1d7a3e;--g400:#22a84f;
+  --g100:#dcfce7;--g50:#f0fdf4;
+  --cream:#faf8f4;--sand:#f2ece0;--sand2:#e8dfd0;--line:#e8e2d8;
+  --ink:#18160f;--ink2:#3d3a30;--muted:#857e6e;
+  --white:#fff;
+  --serif:'Cormorant',Georgia,serif;
+  --sans:'Outfit',system-ui,sans-serif;
+}
+
+html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body{
+  font-family:var(--sans);
+  background:var(--cream);
+  color:var(--ink);
+  min-height:100svh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:2rem;
+  position:relative;
+  overflow:hidden;
+}
+
+/* Subtle background pattern */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(34,168,79,.07) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 80% 110%, rgba(22,101,52,.05) 0%, transparent 60%);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* Floating egg decorations */
+.egg-bg{
+  position:fixed;
+  font-size:clamp(3rem,6vw,6rem);
+  opacity:.04;
+  pointer-events:none;
+  z-index:0;
+  animation:float linear infinite;
+}
+.egg-bg:nth-child(1){top:8%;left:5%;animation-duration:18s;animation-delay:0s;font-size:clamp(2rem,4vw,4.5rem)}
+.egg-bg:nth-child(2){top:20%;right:8%;animation-duration:22s;animation-delay:-6s;font-size:clamp(3rem,5vw,5rem)}
+.egg-bg:nth-child(3){bottom:15%;left:12%;animation-duration:16s;animation-delay:-11s}
+.egg-bg:nth-child(4){bottom:25%;right:6%;animation-duration:20s;animation-delay:-3s;font-size:clamp(2rem,3.5vw,4rem)}
+.egg-bg:nth-child(5){top:50%;left:2%;animation-duration:24s;animation-delay:-8s;font-size:clamp(1.5rem,2.5vw,3rem)}
+
+@keyframes float{
+  0%{transform:translateY(0) rotate(0deg)}
+  33%{transform:translateY(-18px) rotate(6deg)}
+  66%{transform:translateY(8px) rotate(-4deg)}
+  100%{transform:translateY(0) rotate(0deg)}
+}
+
+/* Main card */
+.card{
+  position:relative;z-index:1;
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:2rem;
+  padding:clamp(2.5rem,6vw,4.5rem) clamp(2rem,5vw,4rem);
+  max-width:min(560px,94vw);
+  width:100%;
+  text-align:center;
+  box-shadow:0 24px 80px rgba(0,0,0,.1),0 4px 16px rgba(0,0,0,.05);
+  animation:riseUp .65s cubic-bezier(0,0,.2,1) both;
+}
+
+@keyframes riseUp{
+  from{opacity:0;transform:translateY(40px)}
+  to{opacity:1;transform:none}
+}
+
+/* Checkmark circle */
+.check-wrap{
+  width:clamp(72px,10vw,96px);
+  height:clamp(72px,10vw,96px);
+  background:var(--g50);
+  border:2px solid var(--g100);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto clamp(1.5rem,3vh,2.25rem);
+  animation:popIn .55s .3s cubic-bezier(.34,1.56,.64,1) both;
+  position:relative;
+}
+.check-wrap::after{
+  content:'';
+  position:absolute;inset:-8px;
+  border-radius:50%;
+  border:1px solid rgba(34,168,79,.15);
+  animation:ringPulse 2.5s 1s ease-out infinite;
+}
+
+@keyframes popIn{
+  from{opacity:0;transform:scale(.4)}
+  to{opacity:1;transform:scale(1)}
+}
+@keyframes ringPulse{
+  0%{transform:scale(1);opacity:.6}
+  100%{transform:scale(1.5);opacity:0}
+}
+
+.check-icon{
+  font-size:clamp(1.8rem,3.5vw,2.6rem);
+  animation:fadeIn .4s .7s ease both;
+}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* Kicker */
+.kicker{
+  font-size:.72rem;
+  font-weight:600;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--g500);
+  margin-bottom:.6rem;
+  animation:fadeIn .4s .45s ease both;
+  display:flex;align-items:center;justify-content:center;gap:.6rem;
+}
+.kicker::before,.kicker::after{content:'';display:block;width:24px;height:1px;background:var(--g400);opacity:.5}
+
+/* Title */
+.title{
+  font-family:var(--serif);
+  font-size:clamp(2.4rem,5vw,3.4rem);
+  font-weight:600;
+  color:var(--ink);
+  line-height:1.05;
+  letter-spacing:-.01em;
+  margin-bottom:.6rem;
+  animation:riseUp .5s .35s cubic-bezier(0,0,.2,1) both;
+}
+.title em{font-style:italic;color:var(--g600)}
+
+/* Subtitle */
+.subtitle{
+  font-size:clamp(.875rem,1.2vw,1rem);
+  color:var(--muted);
+  line-height:1.75;
+  font-weight:300;
+  max-width:380px;
+  margin:0 auto clamp(1.75rem,4vh,2.75rem);
+  animation:fadeIn .5s .5s ease both;
+}
+
+/* Info pills */
+.pills{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.6rem;
+  justify-content:center;
+  margin-bottom:clamp(1.75rem,4vh,2.75rem);
+  animation:fadeIn .5s .6s ease both;
+}
+.pill{
+  display:inline-flex;align-items:center;gap:.4rem;
+  background:var(--g50);
+  border:1px solid var(--g100);
+  color:var(--g700);
+  font-size:.75rem;
+  font-weight:500;
+  letter-spacing:.04em;
+  padding:.35rem .85rem;
+  border-radius:9999px;
+}
+
+/* Divider */
+.divider{
+  height:1px;
+  background:var(--line);
+  margin:0 0 clamp(1.75rem,4vh,2.75rem);
+  animation:scaleX .5s .65s cubic-bezier(0,0,.2,1) both;
+  transform-origin:center;
+}
+@keyframes scaleX{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+/* Buttons */
+.btn-wrap{
+  display:flex;flex-direction:column;gap:.75rem;
+  animation:fadeIn .5s .75s ease both;
+}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:.4rem;
+  font-family:var(--sans);font-size:.88rem;font-weight:500;letter-spacing:.02em;
+  border:none;border-radius:9999px;
+  padding:.75rem 1.75rem;
+  transition:background .18s,transform .15s,box-shadow .18s;
+  cursor:pointer;text-decoration:none;
+}
+.btn:active{transform:scale(.97)}
+.btn-primary{
+  background:var(--g600);color:#fff;
+  box-shadow:0 2px 8px rgba(22,101,52,.25),0 4px 18px rgba(22,101,52,.12);
+}
+.btn-primary:hover{background:var(--g700);transform:translateY(-1px);box-shadow:0 4px 20px rgba(22,101,52,.32)}
+.btn-outline{
+  background:transparent;color:var(--ink2);
+  border:1.5px solid var(--line);
+}
+.btn-outline:hover{background:var(--sand);border-color:var(--sand2)}
+
+/* Logo */
+.logo-wrap{
+  margin-bottom:clamp(1.5rem,3vh,2.25rem);
+  animation:fadeIn .4s .1s ease both;
+}
+.logo-wrap img{
+  height:clamp(36px,5vh,48px);
+  width:auto;
+  margin:0 auto;
+  opacity:.7;
+}
+
+/* Footer note */
+.foot-note{
+  margin-top:clamp(1.5rem,3vh,2rem);
+  font-size:.73rem;
+  color:var(--muted);
+  opacity:.65;
+  animation:fadeIn .4s .9s ease both;
+}
+</style>
+</head>
+<body>
+
+<!-- Floating egg decorations -->
+<div class="egg-bg">🥚</div>
+<div class="egg-bg">🥚</div>
+<div class="egg-bg">🥚</div>
+<div class="egg-bg">🥚</div>
+<div class="egg-bg">🥚</div>
+
+<div class="card">
+
+  <div class="logo-wrap">
+    <img src="images/Savoldi_Freiland.png" alt="Savoldi Freiland">
+  </div>
+
+  <div class="check-wrap">
+    <span class="check-icon">✓</span>
+  </div>
+
+  <p class="kicker">Bestellung bestätigt</p>
+  <h1 class="title">Vielen Dank<br>für Ihre<br><em>Bestellung!</em></h1>
+
+  <p class="subtitle">
+    Wir haben Ihre Bestellung erhalten und melden uns in Kürze bei Ihnen —
+    frisch, persönlich und direkt aus Othmarsingen.
+  </p>
+
+  <div class="pills">
+    <span class="pill">📬 Bestätigung folgt per E-Mail</span>
+    <span class="pill">🚚 Heimlieferung</span>
+    <span class="pill">🥚 Täglich frisch</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="btn-wrap">
+    <a href="index.html" class="btn btn-primary">Zurück zur Startseite &nbsp;→</a>
+    <a href="index.html#shop" class="btn btn-outline">Weitere Produkte entdecken</a>
+  </div>
+
+  <p class="foot-note">
+    Fragen? Schreiben Sie uns:<br>
+    <a href="mailto:info@savoldi-freiland.ch" style="color:var(--g600);text-decoration:none">info@savoldi-freiland.ch</a>
+    &nbsp;·&nbsp;
+    <a href="tel:+41797977979" style="color:var(--g600);text-decoration:none">+41 79 797 79 79</a>
+  </p>
+
+</div>
+
+</body>
+</html>
