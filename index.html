@@ -474,6 +474,8 @@ footer{background:var(--g700);margin-top:clamp(3rem,8vh,6rem)}
   .products-grid .product-card:first-child{grid-column:span 1}
   .footer-main{grid-template-columns:1fr}
   .footer-brand{grid-column:auto}
+  #checkout-page .co-card [style*="grid-template-columns:1fr 1fr"],
+  #checkout-page .co-card [style*="grid-template-columns:1fr 2fr"]{grid-template-columns:1fr!important}
 }
 @media(max-width:380px){
   .payment-grid{grid-template-columns:1fr}
@@ -610,7 +612,7 @@ footer{background:var(--g700);margin-top:clamp(3rem,8vh,6rem)}
         <div>
           <p class="ci-label">E-Mail &amp; Telefon</p>
           <p class="ci-value">
-            <a href="mailto:info@savoldi-freiland.ch">info@savoldi-freiland.ch</a>
+            <a href="/cdn-cgi/l/email-protection#deb7b0b8b19eadbfa8b1b2bab7f3b8acbbb7b2bfb0baf0bdb6"><span class="__cf_email__" data-cfemail="f29b9c949db28193849d9e969bdf9480979b9e939c96dc919a">[email&#160;protected]</span></a>
             <a href="tel:+41797977979">+41 79 797 79 79</a>
           </p>
         </div>
@@ -643,17 +645,33 @@ footer{background:var(--g700);margin-top:clamp(3rem,8vh,6rem)}
     <div class="co-card">
       <h3>Ihre Angaben</h3>
       <form id="checkout-form" action="https://formspree.io/f/xlgdqjby" method="POST">
-        <div class="form-group">
-          <label class="form-label">Name</label>
-          <input name="name" placeholder="Max Mustermann" required class="form-input">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)">
+          <div class="form-group">
+            <label class="form-label">Vorname</label>
+            <input name="vorname" placeholder="Max" required class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nachname</label>
+            <input name="nachname" placeholder="Mustermann" required class="form-input">
+          </div>
         </div>
         <div class="form-group">
           <label class="form-label">E-Mail</label>
           <input name="email" type="email" placeholder="max@muster.ch" required class="form-input">
         </div>
         <div class="form-group">
-          <label class="form-label">Lieferadresse</label>
-          <input name="address" placeholder="Strasse Nr, PLZ Ort" required class="form-input">
+          <label class="form-label">Strasse &amp; Hausnummer</label>
+          <input name="strasse" placeholder="Musterstrasse 12" required class="form-input">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 2fr;gap:var(--gap)">
+          <div class="form-group">
+            <label class="form-label">PLZ</label>
+            <input name="plz" placeholder="5000" required class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ort</label>
+            <input name="ort" placeholder="Aarau" required class="form-input">
+          </div>
         </div>
         <div class="form-group" style="margin-bottom:1.5rem">
           <label class="form-label">Zahlungsmethode</label>
@@ -673,6 +691,7 @@ footer{background:var(--g700);margin-top:clamp(3rem,8vh,6rem)}
           </div>
         </div>
         <textarea name="order" id="order-field" class="hidden"></textarea>
+        <input type="hidden" name="lieferadresse">
         <button class="btn btn-primary btn-full btn-lg" type="submit">Bestellung abschicken &nbsp;→</button>
       </form>
       <div id="checkout-success" class="success-toast">
@@ -696,7 +715,7 @@ footer{background:var(--g700);margin-top:clamp(3rem,8vh,6rem)}
     </div>
     <div class="footer-col">
       <h4>Kontakt</h4>
-      <a href="mailto:info@savoldi-freiland.ch">info@savoldi-freiland.ch</a>
+      <a href="/cdn-cgi/l/email-protection#5f363139301f2c3e2930333b3672392d3a36333e313b713c37"><span class="__cf_email__" data-cfemail="335a5d555c734052455c5f575a1e5541565a5f525d571d505b">[email&#160;protected]</span></a>
       <a href="tel:+41797977979">+41 79 797 79 79</a>
     </div>
     <div class="footer-col">
@@ -709,7 +728,7 @@ footer{background:var(--g700);margin-top:clamp(3rem,8vh,6rem)}
   <div class="footer-bottom">© 2026 Savoldi Freiland &nbsp;·&nbsp; realisiert von TwoNet</div>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 'use strict';
 
 /* SCROLL REVEAL */
@@ -881,6 +900,7 @@ function checkout(){
   ).join('\n');
   showPage('checkout');
 }
+}
 
 /* FORM HANDLERS */
 document.getElementById('contact-form').addEventListener('submit',async function(e){
@@ -899,21 +919,11 @@ document.getElementById('contact-form').addEventListener('submit',async function
 
 document.getElementById('checkout-form').addEventListener('submit',async function(e){
   e.preventDefault();
-  const btn=this.querySelector('button[type=submit]'),orig=btn.innerHTML;
-  btn.disabled=true;btn.innerHTML='Wird gesendet…';
-  try{
-    const res=await fetch(this.action,{method:'POST',body:new FormData(this),headers:{Accept:'application/json'}});
-    if(res.ok){
-      this.reset();
-      cart=[];
-      renderCart();
-      window.location.href='danke.html';
-    }
-  }catch(_){}
-  btn.disabled=false;btn.innerHTML=orig;
-});
-
-renderCart();
-</script>
-</body>
-</html>
+  /* Adresse aus Einzelfeldern zusammensetzen */
+  const v=this.querySelector('[name=vorname]').value.trim();
+  const n=this.querySelector('[name=nachname]').value.trim();
+  const s=this.querySelector('[name=strasse]').value.trim();
+  const p=this.querySelector('[name=plz]').value.trim();
+  const o=this.querySelector('[name=ort]').value.trim();
+  this.querySelector('[name=lieferadresse]').value=`${v} ${n} · ${s} · ${p} ${o}`;
+  const btn=this.querySelector('button[type=submit]'),orig=btn.innerHTM
